@@ -263,7 +263,7 @@ public:
 	/// Initialise the Driver transport hardware and software.
 	/// Make sure the Driver is properly configured before calling init().
 	/// \return true if initialisation succeeded.
-	virtual bool    init();
+	virtual bool init();
 
 	/// Tests whether a new message is available
 	/// from the Driver.
@@ -271,7 +271,7 @@ public:
 	/// a message is actually received bythe transport, when it wil be returned to RHModeIdle.
 	/// This can be called multiple times in a timeout loop
 	/// \return true if a new, complete, error-free uncollected message is available to be retreived by recv()
-	virtual bool    available();
+	virtual bool available();
 
 	/// Turns the receiver on if it not already on.
 	/// If there is a valid message available, copy it to buf and return true
@@ -282,7 +282,7 @@ public:
 	/// \param[in] buf Location to copy the received message
 	/// \param[in,out] len Pointer to available space in buf. Set to the actual number of octets copied.
 	/// \return true if a valid message was copied to buf
-	RH_INTERRUPT_ATTR virtual bool    recv (uint8_t* buf, uint8_t* len);
+	virtual bool recv (uint8_t* buf, uint8_t* len);
 
 	/// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
 	/// Then loads a message into the transmitter and starts the transmitter. Note that a message length
@@ -290,7 +290,7 @@ public:
 	/// \param[in] data Array of data to be sent
 	/// \param[in] len Number of bytes of data to send (> 0)
 	/// \return true if the message length was valid and it was correctly queued for transmit
-	virtual bool    send (const uint8_t* data, uint8_t len);
+	virtual bool send (const uint8_t* data, uint8_t len);
 
 	/// Returns the maximum message length
 	/// available in this Driver.
@@ -299,88 +299,83 @@ public:
 
 	/// If current mode is Rx or Tx changes it to Idle. If the transmitter or receiver is running,
 	/// disables them.
-	RH_INTERRUPT_ATTR void           setModeIdle();
+	void setModeIdle();
 
 	/// If current mode is Tx or Idle, changes it to Rx.
 	/// Starts the receiver in the RF69.
-	RH_INTERRUPT_ATTR void           setModeRx();
+	void setModeRx();
 
 	/// If current mode is Rx or Idle, changes it to Rx. F
 	/// Starts the transmitter in the RF69.
-	void           setModeTx();
+	void setModeTx();
 
 	/// dont call this it used by the interrupt handler
-	RH_INTERRUPT_ATTR void            handleTimerInterrupt();
+	void handleTimerInterrupt();
 
 	/// Returns the current speed in bits per second
 	/// \return The current speed in bits per second
-	uint16_t        speed()
-	{
+	uint16_t speed() {
 		return _speed;
 	}
 
-#if (RH_PLATFORM == RH_PLATFORM_ESP8266)
-	/// ESP8266 timer0 increment value
-	uint32_t _timerIncrement;
-#endif
 
 protected:
 	/// Helper function for calculating timer ticks
-	uint8_t         timerCalc (uint16_t speed, uint16_t max_ticks, uint16_t *nticks);
+	uint8_t timerCalc(uint16_t speed, uint16_t max_ticks, uint16_t *nticks);
 
 	/// Set up the timer and its interrutps so the interrupt handler is called at the right frequency
-	void            timerSetup();
+	void timerSetup();
 
 	/// Read the rxPin in a platform dependent way, taking into account whether it is inverted or not
-	RH_INTERRUPT_ATTR bool            readRx();
+	bool readRx();
 
 	/// Write the txPin in a platform dependent way
-	void            writeTx (bool value);
+	void writeTx(bool value);
 
 	/// Write the txPin in a platform dependent way, taking into account whether it is inverted or not
-	void            writePtt (bool value);
+	void writePtt(bool value);
 
 	/// Translates a 6 bit symbol to its 4 bit plaintext equivalent
-	RH_INTERRUPT_ATTR uint8_t         symbol_6to4 (uint8_t symbol);
+	uint8_t symbol_6to4(uint8_t symbol);
 
 	/// The receiver handler function, called a 8 times the bit rate
-	void            receiveTimer();
+	void receiveTimer();
 
 	/// The transmitter handler function, called a 8 times the bit rate
-	void            transmitTimer();
+	void transmitTimer();
 
 	/// Check whether the latest received message is complete and uncorrupted
 	/// We should always check the FCS at user level, not interrupt level
 	/// since it is slow
-	void            validateRxBuf();
+	void validateRxBuf();
 
 	/// Configure bit rate in bits per second
-	uint16_t        _speed;
+	uint16_t _speed;
 
 	/// The configure receiver pin
-	uint8_t         _rxPin;
+	uint8_t _rxPin;
 
 	/// The configure transmitter pin
-	uint8_t         _txPin;
+	uint8_t _txPin;
 
 	/// The configured transmitter enable pin
-	uint8_t         _pttPin;
+	uint8_t _pttPin;
 
 	/// True of the sense of the rxPin is to be inverted
-	bool            _rxInverted;
+	bool  _rxInverted;
 
 	/// True of the sense of the pttPin is to be inverted
-	bool            _pttInverted;
+	bool _pttInverted;
 
 	// Used in the interrupt handlers
 	/// Buf is filled but not validated
-	volatile bool   _rxBufFull;
+	volatile bool _rxBufFull;
 
 	/// Buf is full and valid
-	volatile bool   _rxBufValid;
+	volatile bool _rxBufValid;
 
 	/// Last digital input from the rx data pin
-	volatile bool   _rxLastSample;
+	volatile bool _rxLastSample;
 
 	/// This is the integrate and dump integral. If there are <5 0 samples in the PLL cycle
 	/// the bit is declared a 0, else a 1

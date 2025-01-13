@@ -6,6 +6,7 @@
 #ifndef RHGenericDriver_h
 #define RHGenericDriver_h
 
+#include <avr/io.h>
 #include <RadioHead.h>
 #include <RHPin.h>
 
@@ -59,6 +60,8 @@ public:
 	/// Constructor
 	RHGenericDriver();
 
+    /// Generic destructor to prevent warnings when objects are dynamically allocated
+    virtual ~RHGenericDriver() {};
 	/// Initialise the Driver transport hardware and software.
 	/// Make sure the Driver is properly configured before calling init().
 	/// \return true if initialisation succeeded.
@@ -104,22 +107,22 @@ public:
 
 	/// Starts the receiver and blocks until a valid received
 	/// message is available.
-	virtual void            waitAvailable();
+	virtual void waitAvailable();
 
 	/// Blocks until the transmitter
 	/// is no longer transmitting.
-	virtual bool            waitPacketSent();
+	virtual bool waitPacketSent();
 
 	/// Blocks until the transmitter is no longer transmitting.
 	/// or until the timeout occuers, whichever happens first
 	/// \param[in] timeout Maximum time to wait in milliseconds.
 	/// \return true if the radio completed transmission within the timeout period. False if it timed out.
-	virtual bool            waitPacketSent (uint16_t timeout);
+	virtual bool waitPacketSent (uint16_t timeout);
 
 	/// Starts the receiver and blocks until a received message is available or a timeout
 	/// \param[in] timeout Maximum time to wait in milliseconds.
 	/// \return true if a message is available
-	virtual bool            waitAvailableTimeout (uint16_t timeout);
+	virtual bool waitAvailableTimeout (uint16_t timeout);
 
 	// Bent G Christensen (bentor@gmail.com), 08/15/2016
 	/// Channel Activity Detection (CAD).
@@ -148,7 +151,7 @@ public:
 	/// This is called automatically by waitCAD().
 	/// \return true if the radio-specific CAD (as returned by override of isChannelActive()) shows the
 	/// current radio channel as active, else false. If there is no radio-specific CAD, returns false.
-	virtual bool            isChannelActive();
+	virtual bool isChannelActive();
 
 	/// Sets the address of this node. Defaults to 0xFF. Subclasses or the user may want to change this.
 	/// This will be used to test the adddress in incoming messages. In non-promiscuous mode,
@@ -163,15 +166,15 @@ public:
 
 	/// Sets the TO header to be sent in all subsequent messages
 	/// \param[in] to The new TO header value
-	virtual void           setHeaderTo (uint8_t to);
+	virtual void setHeaderTo (uint8_t to);
 
 	/// Sets the FROM header to be sent in all subsequent messages
 	/// \param[in] from The new FROM header value
-	virtual void           setHeaderFrom (uint8_t from);
+	virtual void setHeaderFrom (uint8_t from);
 
 	/// Sets the ID header to be sent in all subsequent messages
 	/// \param[in] id The new ID header value
-	virtual void           setHeaderId (uint8_t id);
+	virtual void setHeaderId (uint8_t id);
 
 	/// Sets and clears bits in the FLAGS header to be sent in all subsequent messages
 	/// First it clears he FLAGS according to the clear argument, then sets the flags according to the
@@ -180,7 +183,7 @@ public:
 	/// \param[in] clear bitmask of flags to clear. Defaults to RH_FLAGS_APPLICATION_SPECIFIC
 	///            which clears the application specific flags, resulting in new application specific flags
 	///            identical to the set.
-	virtual void           setHeaderFlags (uint8_t set, uint8_t clear = RH_FLAGS_APPLICATION_SPECIFIC);
+	virtual void setHeaderFlags (uint8_t set, uint8_t clear = RH_FLAGS_APPLICATION_SPECIFIC);
 
 	/// Tells the receiver to accept messages with any TO address, not just messages
 	/// addressed to thisAddress or the broadcast address
@@ -249,14 +252,14 @@ public:
 	virtual uint16_t       txGood();
 
 
-	inline void setRxLed (RHPin & led)
+	inline void setRxLed(RHPin & led)
 	{
 		_rxLed = &led;
 		if (_rxLed)
 			_rxLed->begin();
 	}
 
-	inline void setTxLed (RHPin & led)
+	inline void setTxLed(RHPin & led)
 	{
 		_txLed = &led;
 		if (_txLed)
